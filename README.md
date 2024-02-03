@@ -2,7 +2,7 @@
 A Simple Image collator I made to make my life easier in the popular online MMORPG Ravendawn
 
 Here's the collator GUI:
-![Collator](ImageCollator/DemoImages/Collator.png)
+![Collator](ImageCollator/DemoImages/Menu.png)
 
 Here's how it looks when creating a collated image:
 ![Creation Process](ImageCollator/DemoImages/Sets.png)
