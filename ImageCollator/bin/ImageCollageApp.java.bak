@@ -1,0 +1,92 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+public class ImageCollageApp extends JFrame {
+
+    private BufferedImage collageImage;
+    private JPanel collagePanel;
+    private int currentX = 0; // Keep track of the current X position for the next image
+
+    public ImageCollageApp() {
+        collageImage = new BufferedImage(1200, 800, BufferedImage.TYPE_INT_ARGB);
+
+        collagePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(collageImage, 0, 0, this);
+            }
+        };
+
+        JButton pasteButton = new JButton("Paste Image");
+        pasteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pasteImage();
+            }
+        });
+
+        JButton clearButton = new JButton("Clear Collage");
+        clearButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearCollage();
+            }
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(pasteButton);
+        buttonPanel.add(clearButton);
+
+        setLayout(new BorderLayout());
+        add(collagePanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1200, 800); // Set a larger size for the frame
+        setLocationRelativeTo(null);
+        setTitle("Image Collage App");
+        setVisible(true);
+    }
+
+    private void pasteImage() {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable transferable = clipboard.getContents(this);
+
+        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+            try {
+                Image pastedImage = (Image) transferable.getTransferData(DataFlavor.imageFlavor);
+                Graphics2D g2d = collageImage.createGraphics();
+                g2d.drawImage(pastedImage, currentX, 0, null);
+                g2d.dispose();
+
+                // Update the currentX position for the next image
+                currentX += pastedImage.getWidth(null) + 10; // Add 10 pixels spacing
+
+                collagePanel.repaint();
+            } catch (UnsupportedFlavorException | IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void clearCollage() {
+        collageImage = new BufferedImage(1200, 800, BufferedImage.TYPE_INT_ARGB);
+        currentX = 0; // Reset the currentX position
+        collagePanel.repaint();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new ImageCollageApp();
+            }
+        });
+    }
+}
